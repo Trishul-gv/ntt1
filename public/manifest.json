@@ -1,0 +1,13 @@
+{
+  "name": "Nithesh Tours And Travels – Chikkamagaluru",
+  "short_name": "Nithesh Tours",
+  "description": "Chikkamagaluru tour packages, taxi service and South India travel experiences.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f8f5",
+  "theme_color": "#0f3d2e",
+  "icons": [
+    { "src": "/images/live/nithesh-logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
