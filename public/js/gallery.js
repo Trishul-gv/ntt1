@@ -22,16 +22,22 @@
     const lb = document.querySelector(".lightbox");
     if (!lb) return;
     const lbImg = lb.querySelector("img");
+    const lbPrev = lb.querySelector(".lb-prev");
+    const lbNext = lb.querySelector(".lb-next");
     let index = 0, lastFocus = null;
+    let mode = "gallery", renderRequest = 0;
     const visible = () => figures.filter((f) => f.style.display !== "none");
 
     const render = (dir = 0) => {
       const list = visible();
+      if (!list.length) return;
       const img = list[index].querySelector("img");
+      const request = ++renderRequest;
       lbImg.style.setProperty("--lb-shift", dir ? `${dir * -18}px` : "0px");
       lbImg.classList.add("is-swapping");
       const next = new Image();
       next.onload = next.onerror = () => {
+        if (request !== renderRequest || mode !== "gallery") return;
         lbImg.src = next.src;
         lbImg.alt = img.alt;
         lbImg.style.setProperty("--lb-shift", dir ? `${dir * 18}px` : "0px");
@@ -41,20 +47,41 @@
     };
 
     const close = () => {
+      renderRequest++;
+      mode = "gallery";
       lb.classList.remove("open");
+      lb.classList.remove("lightbox--brochure");
+      lb.setAttribute("aria-label", "Image viewer");
       document.body.classList.remove("menu-open");
       lastFocus && lastFocus.focus?.();
     };
     const open = (fig) => {
       lastFocus = document.activeElement;
+      mode = "gallery";
+      lb.classList.remove("lightbox--brochure");
+      lb.setAttribute("aria-label", "Image viewer");
       index = visible().indexOf(fig);
       render();
       lb.classList.add("open");
       document.body.classList.add("menu-open");
       lb.querySelector(".lb-close").focus();
     };
+    const openBrochure = (button) => {
+      renderRequest++;
+      mode = "brochure";
+      lastFocus = button;
+      lbImg.classList.remove("is-swapping");
+      lbImg.src = button.dataset.brochure;
+      lbImg.alt = button.dataset.brochureAlt || "Package itinerary brochure";
+      lb.setAttribute("aria-label", button.dataset.brochureTitle || "Package itinerary brochure");
+      lb.classList.add("lightbox--brochure", "open");
+      document.body.classList.add("menu-open");
+      lb.querySelector(".lb-close").focus();
+    };
     const move = (d) => {
+      if (mode !== "gallery") return;
       const list = visible();
+      if (!list.length) return;
       index = (index + d + list.length) % list.length;
       render(d);
     };
@@ -64,14 +91,17 @@
       f.tabIndex = 0;
       f.addEventListener("keydown", (e) => { if (e.key === "Enter") open(f); });
     });
+    document.querySelectorAll("[data-brochure]").forEach((button) => {
+      button.addEventListener("click", () => openBrochure(button));
+    });
     lb.querySelector(".lb-close").addEventListener("click", close);
-    lb.querySelector(".lb-prev").addEventListener("click", () => move(-1));
-    lb.querySelector(".lb-next").addEventListener("click", () => move(1));
+    lbPrev.addEventListener("click", () => move(-1));
+    lbNext.addEventListener("click", () => move(1));
     document.addEventListener("keydown", (e) => {
       if (!lb.classList.contains("open")) return;
       if (e.key === "Escape") close();
-      if (e.key === "ArrowLeft") move(-1);
-      if (e.key === "ArrowRight") move(1);
+      if (mode === "gallery" && e.key === "ArrowLeft") move(-1);
+      if (mode === "gallery" && e.key === "ArrowRight") move(1);
     });
     lb.addEventListener("click", (e) => { if (e.target === lb) close(); });
 

@@ -3,6 +3,8 @@
 (function () {
   const PHONE = "+919482242996";
   const WHATSAPP = "919482242996";
+  const EMAIL = "nitheshtravelsckm@gmail.com";
+  const MAPS = "https://maps.app.goo.gl/pwsdoigqZkwTpUfS7";
 
   async function include(el) {
     const url = el.getAttribute("data-include");
@@ -30,6 +32,6 @@
     });
   }
 
-  window.NTT = { PHONE, WHATSAPP };
+  window.NTT = { PHONE, WHATSAPP, EMAIL, MAPS };
   document.addEventListener("DOMContentLoaded", loadComponents);
 })();
