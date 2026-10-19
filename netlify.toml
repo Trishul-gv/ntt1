@@ -1,0 +1,8 @@
+[build]
+  command = "bun run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # bunfig.toml uses `minimumReleaseAge`, which requires Bun 1.3+
+  BUN_VERSION = "1.3.12"
