@@ -153,9 +153,21 @@
     document.querySelectorAll("[data-wa-send]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const form = btn.closest("form");
+        if (!form.reportValidity()) return;
+
         const get = (n) => (form.querySelector(`[name="${n}"]`) || {}).value || "";
-        const msg = `Hello Nithesh Tours And Travels,%0AName: ${encodeURIComponent(get("name"))}%0APhone: ${encodeURIComponent(get("phone"))}%0ATrip: ${encodeURIComponent(get("package") || get("subject"))}%0AMessage: ${encodeURIComponent(get("message"))}`;
-        window.open(`https://wa.me/919482242996?text=${msg}`, "_blank", "noopener");
+        const lines = [
+          "Hello Nithesh Tours And Travels,",
+          `Name: ${get("name")}`,
+          `Phone: ${get("phone")}`,
+        ];
+        if (get("email")) lines.push(`Email: ${get("email")}`);
+        if (get("date")) lines.push(`Travel Date: ${get("date")}`);
+        lines.push(`Trip: ${get("package") || get("subject")}`, `Message: ${get("message")}`);
+
+        const whatsappUrl = new URL("https://wa.me/919482242996");
+        whatsappUrl.searchParams.set("text", lines.join("\n"));
+        window.open(whatsappUrl.toString(), "_blank", "noopener");
       });
     });
   }
